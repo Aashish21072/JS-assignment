@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Veg Shop</title>
+
+    <link rel="stylesheet" href="style.css">
+
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</head>
+<body>
+
+<div class="container">
+
+    <h1>🥦 Veg Shop</h1>
+
+    <form id="vegForm">
+
+        <input
+            type="text"
+            id="name"
+            placeholder="Vegetable Name"
+            required
+        >
+
+        <input
+            type="number"
+            id="price"
+            placeholder="Price"
+            required
+        >
+
+        <input
+            type="number"
+            id="quantity"
+            placeholder="Quantity"
+            required
+        >
+
+        <button type="submit">Add To Shop</button>
+
+    </form>
+
+    <h2>
+        Total Items :
+        <span id="total">0</span>
+    </h2>
+
+    <ul id="vegList"></ul>
+
+</div>
+
+<script src="script.js"></script>
+
+</body>
+</html>
