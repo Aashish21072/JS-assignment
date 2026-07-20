@@ -1,5 +1,4 @@
-const API_URL =
-  "https://crudcrud.com/api/869dc760806e47108e7bd57a92464a1e/vegetables";
+const API_URL = "https://6a5df26a0ad09982aef7d08d.mockapi.io/vegetable";
 
 const form = document.getElementById("vegForm");
 const list = document.getElementById("vegList");
@@ -9,38 +8,48 @@ const nameInput = document.getElementById("name");
 const priceInput = document.getElementById("price");
 const quantityInput = document.getElementById("quantity");
 
-// Load vegetables when page loads
-document.addEventListener("DOMContentLoaded", () => {
-  loadVegetables();
-});
+// Load vegetables on page load
+document.addEventListener("DOMContentLoaded", loadVegetables);
 
-// Add Vegetable
-form.addEventListener("submit", (e) => {
+// ---------------- ADD VEGETABLE ----------------
+
+form.addEventListener("submit", function (e) {
   e.preventDefault();
 
+  const name = nameInput.value.trim();
+  const price = Number(priceInput.value);
+  const quantity = Number(quantityInput.value);
+
+  if (name === "" || price <= 0 || quantity <= 0) {
+    alert("Please enter valid details.");
+    return;
+  }
+
   const vegetable = {
-    name: nameInput.value,
-    price: priceInput.value,
-    quantity: quantityInput.value,
+    name,
+    price,
+    quantity,
   };
 
   axios
     .post(API_URL, vegetable)
     .then(() => {
-      loadVegetables();
       form.reset();
+      loadVegetables();
     })
     .catch((err) => console.log(err));
 });
 
-// Load all vegetables
+// ---------------- LOAD VEGETABLES ----------------
+
 function loadVegetables() {
   axios
     .get(API_URL)
     .then((res) => {
       list.innerHTML = "";
 
-      res.data.forEach((veg) => {
+      // Latest added vegetable at top
+      res.data.reverse().forEach((veg) => {
         displayVegetable(veg);
       });
 
@@ -49,26 +58,26 @@ function loadVegetables() {
     .catch((err) => console.log(err));
 }
 
-// Display vegetable
+// ---------------- DISPLAY VEGETABLE ----------------
+
 function displayVegetable(veg) {
   const li = document.createElement("li");
 
   li.innerHTML = `
-    <strong>${veg.name}</strong>
-    &nbsp; Rs.${veg.price}
-    &nbsp; Qty: ${veg.quantity}
+        <strong>${veg.name}</strong>
+        &nbsp; ₹${veg.price}
+        &nbsp; Qty: ${veg.quantity} Kg
 
-    <input
-      class="buyInput"
-      type="number"
-      placeholder="Qty"
-      min="1"
-      style="width:70px;"
-    />
+        <input
+            type="number"
+            class="buyInput"
+            placeholder="Qty"
+            min="1"
+        />
 
-    <button class="buyBtn">Buy</button>
-    <button class="deleteBtn">Delete</button>
-  `;
+        <button class="buyBtn">Buy</button>
+        <button class="deleteBtn">Delete</button>
+    `;
 
   list.appendChild(li);
 
@@ -76,22 +85,24 @@ function displayVegetable(veg) {
   const deleteBtn = li.querySelector(".deleteBtn");
   const buyInput = li.querySelector(".buyInput");
 
-  // Delete Vegetable
-  deleteBtn.addEventListener("click", () => {
+  // DELETE
+
+  deleteBtn.addEventListener("click", function () {
     axios
-      .delete(`${API_URL}/${veg._id}`)
+      .delete(`${API_URL}/${veg.id}`)
       .then(() => {
         loadVegetables();
       })
       .catch((err) => console.log(err));
   });
 
-  // Buy Vegetable
-  buyBtn.addEventListener("click", () => {
+  // BUY
+
+  buyBtn.addEventListener("click", function () {
     const buyQty = Number(buyInput.value);
 
     if (buyQty <= 0) {
-      alert("Enter a valid quantity");
+      alert("Enter valid quantity");
       return;
     }
 
@@ -102,23 +113,22 @@ function displayVegetable(veg) {
 
     const updatedVegetable = {
       name: veg.name,
-      price: veg.price,
+      price: Number(veg.price),
       quantity: Number(veg.quantity) - buyQty,
     };
 
     axios
-      .delete(`${API_URL}/${veg._id}`)
+      .put(`${API_URL}/${veg.id}`, updatedVegetable)
       .then(() => {
-        return axios.post(API_URL, updatedVegetable);
-      })
-      .then(() => {
+        buyInput.value = "";
         loadVegetables();
       })
       .catch((err) => console.log(err));
   });
 }
 
-// Update total items
+// ---------------- TOTAL ----------------
+
 function updateTotal(count) {
   total.textContent = count;
 }
